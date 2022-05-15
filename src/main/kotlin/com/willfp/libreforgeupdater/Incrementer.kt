@@ -6,17 +6,8 @@ interface Incrementer {
     fun increment(properties: Properties)
 
     companion object {
-        /*
         fun of(type: IncrementType): Incrementer = if (type == IncrementType.MAJOR)
             MajorIncrementer else MinorIncrementer
-
-         */
-
-        fun of(type: IncrementType): Incrementer = object : Incrementer {
-            override fun increment(properties: Properties) {
-                return
-            }
-        }
     }
 }
 

@@ -80,7 +80,7 @@ class Updater(
         exec("git config pull.rebase false", root)
         exec("git pull", root)
         exec("git add .", root)
-        exec("git commit -m libreforge-updater: Updated libreforge", root)
+        exec("git commit -m libreforge-updater", root)
         exec("git push origin master", root)
     }
 
