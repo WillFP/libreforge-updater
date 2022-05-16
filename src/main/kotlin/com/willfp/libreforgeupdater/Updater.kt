@@ -89,7 +89,7 @@ class Updater(
 
         if (System.getProperty("os.name").lowercase().contains("windows")) {
             println("OS: Windows")
-            exec("gradlew build", root)
+            exec("gradlew.bat build", root)
         } else {
             println("OS: Unix")
             exec("./gradlew build", root)
