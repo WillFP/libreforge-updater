@@ -21,6 +21,7 @@ private object MajorIncrementer : Incrementer {
         val currentVersion = properties.getProperty("version")
         val split = currentVersion.split(".").map { it.toInt() }.toMutableList()
         split[1]++
+        split[2] = 0
         properties.setProperty("version", split.joinToString("."))
     }
 }
