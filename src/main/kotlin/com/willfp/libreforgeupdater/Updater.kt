@@ -16,6 +16,10 @@ class Updater(
             throw RuntimeException("Root must be a folder!")
         }
 
+        println("Fetching from git")
+        exec("git config pull.rebase false", root)
+        exec("git pull", root)
+
 
         println("Incrementing version number")
         incrementVersion(File(root, "gradle.properties").throwNotExists())
@@ -77,8 +81,6 @@ class Updater(
     }
 
     private fun pushToGit(root: File) {
-        exec("git config pull.rebase false", root)
-        exec("git pull", root)
         exec("git add .", root)
         exec("git commit -m libreforge-updater", root)
         exec("git push origin master", root)
