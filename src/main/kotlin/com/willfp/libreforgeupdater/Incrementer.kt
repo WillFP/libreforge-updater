@@ -6,14 +6,18 @@ interface Incrementer {
     fun increment(properties: Properties)
 
     companion object {
-        fun of(type: IncrementType): Incrementer = if (type == IncrementType.MAJOR)
-            MajorIncrementer else MinorIncrementer
+        fun of(type: IncrementType): Incrementer = when(type) {
+            IncrementType.MAJOR -> MajorIncrementer
+            IncrementType.MINOR -> MinorIncrementer
+            IncrementType.NONE -> NoIncrementer
+        }
     }
 }
 
 enum class IncrementType {
     MAJOR,
-    MINOR
+    MINOR,
+    NONE
 }
 
 private object MajorIncrementer : Incrementer {
@@ -21,6 +25,7 @@ private object MajorIncrementer : Incrementer {
         val currentVersion = properties.getProperty("version")
         val split = currentVersion.split(".").map { it.toInt() }.toMutableList()
         split[1]++
+        split[2] = 0
         properties.setProperty("version", split.joinToString("."))
     }
 }
@@ -31,5 +36,11 @@ private object MinorIncrementer : Incrementer {
         val split = currentVersion.split(".").map { it.toInt() }.toMutableList()
         split[2]++
         properties.setProperty("version", split.joinToString("."))
+    }
+}
+
+private object NoIncrementer : Incrementer {
+    override fun increment(properties: Properties) {
+
     }
 }
