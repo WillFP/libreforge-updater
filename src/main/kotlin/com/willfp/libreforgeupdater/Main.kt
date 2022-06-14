@@ -40,11 +40,23 @@ fun main(args: Array<String>) {
 
     println("Projects: ${projects.map { it.name }}")
 
+    val failures = mutableListOf<String>()
+
     for (project in projects) {
         println("Updating ${project.name}...")
-        updater.update(project)
+
+        try {
+            updater.update(project)
+        } catch(e: Exception) {
+            println("Error updating ${project.name}")
+            failures.add(project.name)
+        }
+
         println()
     }
 
     println("Updated projects!")
+    if (failures.isNotEmpty()) {
+        println("Failed builds / updates: ${failures.joinToString(", ")}")
+    }
 }
