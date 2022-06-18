@@ -21,7 +21,7 @@ enum class IncrementType {
 }
 
 private object MajorIncrementer : Incrementer {
-    override fun increment(properties: Properties) {
+    override fun increment(properties: Properties): String {
         val currentVersion = properties.getProperty("version")
         val split = currentVersion.split(".").map { it.toInt() }.toMutableList()
         split[1]++
@@ -29,22 +29,22 @@ private object MajorIncrementer : Incrementer {
         val str = split.joinToString(".")
         properties.setProperty("version", str)
         return str
-    }: String
+    }
 }
 
 private object MinorIncrementer : Incrementer {
-    override fun increment(properties: Properties) {
+    override fun increment(properties: Properties): String {
         val currentVersion = properties.getProperty("version")
         val split = currentVersion.split(".").map { it.toInt() }.toMutableList()
         split[2]++
         val str = split.joinToString(".")
         properties.setProperty("version", split.joinToString("."))
         return str
-    }: String
+    }
 }
 
 private object NoIncrementer : Incrementer {
-    override fun increment(properties: Properties) {
+    override fun increment(properties: Properties): String {
         return ""
     }
 }
