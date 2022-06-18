@@ -22,14 +22,14 @@ class Updater(
 
 
         println("Incrementing version number")
-        incrementVersion(File(root, "gradle.properties").throwNotExists())
+        val newVersion = incrementVersion(File(root, "gradle.properties").throwNotExists())
 
         println("Setting libreforge version to $version")
         setLibreforgeVersion(File(root, "build.gradle"))
         setLibreforgeVersion(File(File(root, "eco-core"), "build.gradle"))
 
         println("Pushing to git")
-        pushToGit(root)
+        pushToGit(root, newVersion)
 
         println("Building project (this may take some time)")
         buildProject(root)
@@ -80,10 +80,15 @@ class Updater(
         Files.write(buildGradle.toPath(), newLines)
     }
 
-    private fun pushToGit(root: File) {
+    private fun pushToGit(root: File, newVersion: String) {
         exec("git add .", root)
         exec("git commit -m libreforge-updater", root)
-        exec("git push origin master", root)
+        if (newVersion.length > 1) {
+            exec("git tag $newVersion")
+            exec("git push origin master --tags", root)
+        } else {
+            exec("git push origin master", root)
+        }
     }
 
     private fun buildProject(root: File) {

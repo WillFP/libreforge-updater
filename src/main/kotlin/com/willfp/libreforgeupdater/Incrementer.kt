@@ -3,7 +3,7 @@ package com.willfp.libreforgeupdater
 import java.util.Properties
 
 interface Incrementer {
-    fun increment(properties: Properties)
+    fun increment(properties: Properties): String
 
     companion object {
         fun of(type: IncrementType): Incrementer = when(type) {
@@ -26,8 +26,10 @@ private object MajorIncrementer : Incrementer {
         val split = currentVersion.split(".").map { it.toInt() }.toMutableList()
         split[1]++
         split[2] = 0
-        properties.setProperty("version", split.joinToString("."))
-    }
+        val str = split.joinToString(".")
+        properties.setProperty("version", str)
+        return str
+    }: String
 }
 
 private object MinorIncrementer : Incrementer {
@@ -35,12 +37,14 @@ private object MinorIncrementer : Incrementer {
         val currentVersion = properties.getProperty("version")
         val split = currentVersion.split(".").map { it.toInt() }.toMutableList()
         split[2]++
+        val str = split.joinToString(".")
         properties.setProperty("version", split.joinToString("."))
-    }
+        return str
+    }: String
 }
 
 private object NoIncrementer : Incrementer {
     override fun increment(properties: Properties) {
-
+        return ""
     }
 }
