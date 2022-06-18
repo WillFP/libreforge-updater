@@ -5,7 +5,7 @@ import java.io.FileInputStream
 import java.io.FileNotFoundException
 import java.io.FileOutputStream
 import java.nio.file.Files
-import java.util.Properties
+import java.util.*
 
 class Updater(
     private val incrementer: Incrementer,
@@ -35,15 +35,17 @@ class Updater(
         buildProject(root)
     }
 
-    private fun incrementVersion(buildGradle: File) {
+    private fun incrementVersion(buildGradle: File): String {
         val prop = Properties()
 
         var before: String
 
+        var newVersion: String
+
         FileInputStream(buildGradle).use {
             prop.load(it)
             before = prop.getProperty("version")
-            incrementer.increment(prop)
+            newVersion = incrementer.increment(prop)
             val out = FileOutputStream(buildGradle)
             prop.store(out, "libreforge-updater")
         }
@@ -51,6 +53,7 @@ class Updater(
         val after = prop.getProperty("version")
 
         println("$before --> $after")
+        return newVersion
     }
 
     private fun setLibreforgeVersion(buildGradle: File) {
@@ -84,7 +87,7 @@ class Updater(
         exec("git add .", root)
         exec("git commit -m libreforge-updater", root)
         if (newVersion.length > 1) {
-            exec("git tag $newVersion")
+            exec("git tag $newVersion", root)
             exec("git push origin master --tags", root)
         } else {
             exec("git push origin master", root)
