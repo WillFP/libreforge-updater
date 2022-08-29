@@ -2,6 +2,7 @@ package com.willfp.libreforgeupdater
 
 import kotlinx.cli.ArgParser
 import kotlinx.cli.ArgType
+import kotlinx.cli.default
 import kotlinx.cli.multiple
 import kotlinx.cli.required
 
@@ -30,6 +31,13 @@ fun main(args: Array<String>) {
         description = "The name of a project to exclude"
     ).multiple()
 
+    val noCommit by parser.option(
+        ArgType.Boolean,
+        shortName = "nc",
+        fullName = "nocommit",
+        description = "If a commit should not be made"
+    ).default(false)
+
     val directoryName by parser.argument(
         ArgType.String,
         description = "The directory to scan for projects"
@@ -56,7 +64,7 @@ fun main(args: Array<String>) {
         println("Updating ${project.name}...")
 
         try {
-            updater.update(project)
+            updater.update(project, noCommit)
         } catch(e: Exception) {
             println("Error updating ${project.name}")
             failures.add(project.name)

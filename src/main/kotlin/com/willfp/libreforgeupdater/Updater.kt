@@ -11,7 +11,7 @@ class Updater(
     private val incrementer: Incrementer,
     private val version: String
 ) {
-    fun update(root: File) {
+    fun update(root: File, noCommit: Boolean) {
         if (!root.isDirectory) {
             throw RuntimeException("Root must be a folder!")
         }
@@ -28,8 +28,10 @@ class Updater(
         setLibreforgeVersion(File(root, "build.gradle"))
         setLibreforgeVersion(File(File(root, "eco-core"), "build.gradle"))
 
-        println("Pushing to git")
-        pushToGit(root, newVersion)
+        if (!noCommit) {
+            println("Pushing to git")
+            pushToGit(root, newVersion)
+        }
 
         println("Building project (this may take some time)")
         buildProject(root)
