@@ -2,6 +2,7 @@ package com.willfp.libreforgeupdater
 
 import kotlinx.cli.ArgParser
 import kotlinx.cli.ArgType
+import kotlinx.cli.multiple
 import kotlinx.cli.required
 
 
@@ -22,6 +23,13 @@ fun main(args: Array<String>) {
         description = "The version of libreforge to update to"
     ).required()
 
+    val excludes by parser.option(
+        ArgType.String,
+        shortName = "e",
+        fullName = "exclude",
+        description = "The name of a project to exclude"
+    ).multiple()
+
     val directoryName by parser.argument(
         ArgType.String,
         description = "The directory to scan for projects"
@@ -31,12 +39,14 @@ fun main(args: Array<String>) {
 
     val updater = Updater(Incrementer.of(incrementType), version)
 
-    val projects = ProjectScanner(directoryName).getLibreforgeProjects()
+    val projects = ProjectScanner(directoryName).getLibreforgeProjects().toMutableList()
 
     if (projects.isEmpty()) {
         println("No projects found!")
         return
     }
+
+    projects.removeIf { it.name.lowercase() in excludes.map { e -> e.lowercase() }}
 
     println("Projects: ${projects.map { it.name }}")
 
