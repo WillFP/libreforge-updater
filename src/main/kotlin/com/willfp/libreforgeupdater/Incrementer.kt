@@ -23,10 +23,16 @@ enum class IncrementType {
 private object MajorIncrementer : Incrementer {
     override fun increment(properties: Properties): String {
         val currentVersion = properties.getProperty("version")
-        val split = currentVersion.split(".").map { it.toInt() }.toMutableList()
-        split[1]++
-        split[2] = 0
-        val str = split.joinToString(".")
+        val str = if (currentVersion.contains("-b")) {
+            val split = currentVersion.split("-b").toMutableList()
+            split[1] = (split[1].toInt() + 1).toString()
+            split.joinToString("-b")
+        } else {
+            val split = currentVersion.split(".").map { it.toInt() }.toMutableList()
+            split[1]++
+            split[2] = 0
+            split.joinToString(".")
+        }
         properties.setProperty("version", str)
         return str
     }
@@ -35,10 +41,16 @@ private object MajorIncrementer : Incrementer {
 private object MinorIncrementer : Incrementer {
     override fun increment(properties: Properties): String {
         val currentVersion = properties.getProperty("version")
-        val split = currentVersion.split(".").map { it.toInt() }.toMutableList()
-        split[2]++
-        val str = split.joinToString(".")
-        properties.setProperty("version", split.joinToString("."))
+        val str = if (currentVersion.contains("-b")) {
+            val split = currentVersion.split("-b").toMutableList()
+            split[1] = (split[1].toInt() + 1).toString()
+            split.joinToString("-b")
+        } else {
+            val split = currentVersion.split(".").map { it.toInt() }.toMutableList()
+            split[2]++
+            split.joinToString(".")
+        }
+        properties.setProperty("version", str)
         return str
     }
 }
