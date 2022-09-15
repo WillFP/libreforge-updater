@@ -43,9 +43,16 @@ fun main(args: Array<String>) {
         description = "The directory to scan for projects"
     )
 
+    val out by parser.option(
+        ArgType.String,
+        shortName = "o",
+        fullName = "out",
+        description = "The directory to put all jars in"
+    )
+
     parser.parse(args)
 
-    val updater = Updater(Incrementer.of(incrementType), version)
+    val updater = Updater(Incrementer.of(incrementType), version, out)
 
     val projects = ProjectScanner(directoryName).getLibreforgeProjects().toMutableList()
 

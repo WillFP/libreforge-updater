@@ -9,32 +9,38 @@ import java.util.*
 
 class Updater(
     private val incrementer: Incrementer,
-    private val version: String
+    private val version: String,
+    private val outDir: String?
 ) {
     fun update(root: File, noCommit: Boolean) {
         if (!root.isDirectory) {
             throw RuntimeException("Root must be a folder!")
         }
 
-        println("Fetching from git")
+        println("Fetching from git...")
         exec("git config pull.rebase false", root)
         exec("git pull", root)
 
 
-        println("Incrementing version number")
+        println("Incrementing version number...")
         val newVersion = incrementVersion(File(root, "gradle.properties").throwNotExists())
 
-        println("Setting libreforge version to $version")
+        println("Setting libreforge version to $version...")
         setLibreforgeVersion(File(root, "build.gradle"))
         setLibreforgeVersion(File(File(root, "eco-core"), "build.gradle"))
 
         if (!noCommit) {
-            println("Pushing to git")
+            println("Pushing to git...")
             pushToGit(root, newVersion)
         }
 
-        println("Building project (this may take some time)")
+        println("Building project...")
         buildProject(root)
+
+        if (outDir != null) {
+            println("Copying to out directory...")
+            copyBinaries(root, outDir)
+        }
     }
 
     private fun incrementVersion(buildGradle: File): String {
@@ -106,6 +112,21 @@ class Updater(
             println("OS: Unix")
             exec("./gradlew build", root)
         }
+    }
+
+    private fun copyBinaries(root: File, outDir: String) {
+        val directory = File(outDir)
+
+        directory.deleteRecursively()
+        directory.mkdirs()
+
+        val binaries = File(root, "bin")
+        if (!binaries.exists()) {
+            println("Could not find any binaries!")
+            return
+        }
+
+        binaries.copyRecursively(directory, false)
     }
 
     private fun File.throwNotExists(): File {
