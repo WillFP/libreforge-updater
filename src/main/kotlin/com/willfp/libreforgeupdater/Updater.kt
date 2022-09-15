@@ -117,9 +117,6 @@ class Updater(
     private fun copyBinaries(root: File, outDir: String) {
         val directory = File(outDir)
 
-        directory.deleteRecursively()
-        directory.mkdirs()
-
         val bin = File(root, "bin")
         if (!bin.exists()) {
             println("Could not find any binaries!")

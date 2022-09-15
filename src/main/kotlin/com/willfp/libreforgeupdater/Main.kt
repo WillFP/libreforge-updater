@@ -5,6 +5,7 @@ import kotlinx.cli.ArgType
 import kotlinx.cli.default
 import kotlinx.cli.multiple
 import kotlinx.cli.required
+import java.io.File
 
 
 fun main(args: Array<String>) {
@@ -51,6 +52,14 @@ fun main(args: Array<String>) {
     )
 
     parser.parse(args)
+
+    if (out != null) {
+        println("Preparing out directory...")
+        val directory = File(out!!)
+
+        directory.deleteRecursively()
+        directory.mkdirs()
+    }
 
     val updater = Updater(Incrementer.of(incrementType), version, out)
 
