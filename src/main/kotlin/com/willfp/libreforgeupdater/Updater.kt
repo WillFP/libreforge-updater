@@ -120,13 +120,16 @@ class Updater(
         directory.deleteRecursively()
         directory.mkdirs()
 
-        val binaries = File(root, "bin")
-        if (!binaries.exists()) {
+        val bin = File(root, "bin")
+        if (!bin.exists()) {
             println("Could not find any binaries!")
             return
         }
 
-        binaries.copyRecursively(directory, false)
+        val binaries = bin.listFiles()?.toList() ?: emptyList()
+        for (binary in binaries) {
+            binary.copyTo(File(directory, binary.name), true)
+        }
     }
 
     private fun File.throwNotExists(): File {
