@@ -9,7 +9,7 @@ import java.io.File
 
 
 fun main(args: Array<String>) {
-    val parser = ArgParser("libreforgeupdater")
+    val parser = ArgParser("libreforge-updater")
 
     val incrementType by parser.option(
         ArgType.Choice<IncrementType>(),
@@ -32,6 +32,13 @@ fun main(args: Array<String>) {
         description = "The name of a project to exclude"
     ).multiple()
 
+    val whitelist by parser.option(
+        ArgType.String,
+        shortName = "w",
+        fullName = "whitelist",
+        description = "The name of a project to whitelist"
+    ).multiple()
+
     val noCommit by parser.option(
         ArgType.Boolean,
         shortName = "nc",
@@ -39,10 +46,24 @@ fun main(args: Array<String>) {
         description = "If a commit should not be made"
     ).default(false)
 
+    val fullErrors by parser.option(
+        ArgType.Boolean,
+        shortName = "fe",
+        fullName = "fullerrors",
+        description = "If full errors should be shown"
+    ).default(false)
+
     val directoryName by parser.argument(
         ArgType.String,
         description = "The directory to scan for projects"
     )
+
+    val message by parser.option(
+        ArgType.String,
+        shortName = "m",
+        fullName = "message",
+        description = "Ths commit message"
+    ).default("libreforge-updater")
 
     val out by parser.option(
         ArgType.String,
@@ -61,7 +82,7 @@ fun main(args: Array<String>) {
         directory.mkdirs()
     }
 
-    val updater = Updater(Incrementer.of(incrementType), version, out)
+    val updater = Updater(Incrementer.of(incrementType), version, out, message)
 
     val projects = ProjectScanner(directoryName).getLibreforgeProjects().toMutableList()
 
@@ -70,7 +91,10 @@ fun main(args: Array<String>) {
         return
     }
 
-    projects.removeIf { it.name.lowercase() in excludes.map { e -> e.lowercase() }}
+    projects.removeIf { it.name.lowercase() in excludes.map { e -> e.lowercase() } }
+    if (whitelist.isNotEmpty()) {
+        projects.removeIf { it.name.lowercase() !in whitelist.map { w -> w.lowercase() } }
+    }
 
     println("Projects: ${projects.map { it.name }}")
 
@@ -81,8 +105,11 @@ fun main(args: Array<String>) {
 
         try {
             updater.update(project, noCommit)
-        } catch(e: Exception) {
+        } catch (e: Exception) {
             println("Error updating ${project.name}")
+            if (fullErrors) {
+                e.printStackTrace()
+            }
             failures.add(project.name)
         }
 

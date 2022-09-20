@@ -5,12 +5,13 @@ import java.io.FileInputStream
 import java.io.FileNotFoundException
 import java.io.FileOutputStream
 import java.nio.file.Files
-import java.util.*
+import java.util.Properties
 
 class Updater(
     private val incrementer: Incrementer,
     private val version: String,
-    private val outDir: String?
+    private val outDir: String?,
+    private val message: String
 ) {
     fun update(root: File, noCommit: Boolean) {
         if (!root.isDirectory) {
@@ -31,7 +32,7 @@ class Updater(
 
         if (!noCommit) {
             println("Pushing to git...")
-            pushToGit(root, newVersion)
+            pushToGit(root, newVersion, message)
         }
 
         println("Building project...")
@@ -91,9 +92,9 @@ class Updater(
         Files.write(buildGradle.toPath(), newLines)
     }
 
-    private fun pushToGit(root: File, newVersion: String) {
+    private fun pushToGit(root: File, newVersion: String, message: String) {
         exec("git add .", root)
-        exec("git commit -m libreforge-updater", root)
+        exec("git commit -m $message", root)
         if (newVersion.length > 1) {
             exec("git tag $newVersion", root)
             exec("git push origin master --tags", root)
