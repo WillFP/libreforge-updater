@@ -28,6 +28,7 @@ class Updater(
 
         println("Setting libreforge version to $version...")
         setLibreforgeVersion(File(root, "build.gradle"))
+        setLibreforgeVersion(File(root, "build.gradle.kts"))
         setLibreforgeVersion(File(File(root, "eco-core"), "build.gradle"))
 
         if (!noCommit) {

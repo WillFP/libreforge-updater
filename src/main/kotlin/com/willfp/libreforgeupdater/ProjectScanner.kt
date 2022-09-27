@@ -20,7 +20,8 @@ class ProjectScanner(
         }
 
         val buildGradle = File(file, "build.gradle")
-        if (!buildGradle.exists()) {
+        val buildGradleKts = File(file, "build.gradle.kts")
+        if (!buildGradle.exists() && !buildGradleKts.exists()) {
             return false
         }
 
