@@ -21,10 +21,15 @@ class ProjectScanner(
 
         val buildGradle = File(file, "build.gradle")
         val buildGradleKts = File(file, "build.gradle.kts")
-        if (!buildGradle.exists() && !buildGradleKts.exists()) {
-            return false
+
+        if (buildGradle.exists()) {
+            return buildGradle.readLines().any { it.contains("libreforge") }
         }
 
-        return buildGradle.readLines().any { it.contains("libreforge") }
+        if (buildGradleKts.exists()) {
+            return buildGradleKts.readLines().any { it.contains("libreforge") }
+        }
+
+        return false
     }
 }
